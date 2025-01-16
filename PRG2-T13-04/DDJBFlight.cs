@@ -13,7 +13,7 @@ namespace PRG2_T13_04
         public double RequestFee
         { get { return requestFee; } set { requestFee = value; } }
 
-        public override double CalculateFee()
+        public override double CalculateFees()
         {
             double fee = 300;
             if (Origin == "Singapore")
@@ -23,7 +23,7 @@ namespace PRG2_T13_04
             return fee;
         }
         public override string ToString()
-        { return base.ToString() + "\nFees for the FLight: " + CalculateFee(); }
+        { return base.ToString() + "\nFees for the FLight: " + CalculateFees(); }
 
         public DDJBFlight() : base()
         { }
