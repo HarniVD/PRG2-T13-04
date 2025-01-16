@@ -66,6 +66,10 @@ namespace PRG2_T13_04
             { output += "\n" + kvp.Value.FlightNumber; }
             return output;
         }
+        public Airline()
+        { }
+        public Airline(string n,string c)
+        { Name = n; Code = c;Flights = new Dictionary<string, Flight>(); }
 
 
     }
