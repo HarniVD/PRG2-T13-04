@@ -29,7 +29,7 @@ namespace PRG2_T13_04
         public string Status
             { get { return status; } set { status = value; } }
 
-        public abstract double CalculateFee();
+        public abstract double CalculateFees();
 
         public override string ToString()
         {

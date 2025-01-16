@@ -29,12 +29,12 @@ namespace PRG2_T13_04
         {
             foreach (KeyValuePair<string, Airline> kvp in Airlines)
             {
-                if (kvp.Key == a.FlightNumber)
+                if (kvp.Key == a.Code)
                 {
                     return false;
                 }
             }
-            Airlines.Add(a.FlightNumber, a);
+            Airlines.Add(a.Code, a);
             return true;
         }
         public bool AddBoardingGate(BoardingGate bg)
@@ -67,7 +67,6 @@ namespace PRG2_T13_04
         {
             foreach (Airline a in Airlines.Values)
             {
-                // temp unfinished
                 Console.WriteLine($"Final total fees for {a.Name} is {a.CalculateFees()}");
             }
         }

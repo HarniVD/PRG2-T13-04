@@ -24,13 +24,13 @@ namespace PRG2_T13_04
         public bool AddFlight(Flight f)
         { 
             foreach(KeyValuePair<string,Flight> kvp in flights)
-            { if(kvp.Key!=f.FlightNumber)
+            { if(kvp.Key == f.FlightNumber)
                 {
-                    Flights.Add(f.FlightNumber, f);
-                    return true;
+                    return false;
                 }
             }
-            return false;
+            Flights.Add(f.FlightNumber, f);
+            return true;
 
         }
 
@@ -48,12 +48,12 @@ namespace PRG2_T13_04
 
         }
 
-        public double CalculateFee()
+        public double CalculateFees()
         {
             double fee = 0;
             foreach (KeyValuePair<string, Flight> kvp in flights)
             {
-                fee += kvp.Value.CalculateFee();
+                fee += kvp.Value.CalculateFees();
 
             }
             return fee;

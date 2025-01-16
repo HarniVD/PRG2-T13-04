@@ -8,7 +8,7 @@ namespace PRG2_T13_04
 {
     internal class NORMFlight:Flight
     {
-        public override double CalculateFee()
+        public override double CalculateFees()
         {
             double fee = 300;
             if (Origin == "Singapore")
