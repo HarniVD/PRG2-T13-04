@@ -5,7 +5,7 @@ internal class Program
     static Dictionary<string,BoardingGate> boardingDict = new Dictionary<string,BoardingGate>();
     private static void Main(string[] args)
     {
-        LoadAirline();
+        
     }
 
     private static void LoadAirline()
