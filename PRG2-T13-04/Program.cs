@@ -5,6 +5,7 @@ internal class Program
     {
         Dictionary<string, Flight> flightsDict = new Dictionary<string, Flight>();
         LoadFlights(flightsDict);
+        LoadAirline();
     }
     public static void LoadFlights(Dictionary<string, Flight> flightsDict)
     {
@@ -35,6 +36,34 @@ internal class Program
                 flightsDict.Add(newFlight.FlightNumber, newFlight);
                 line = sr.ReadLine();
             }
+        }
+    }
+
+    static List<Airline> airlineList = new List<Airline>();
+    static Dictionary<string, BoardingGate> boardingDict = new Dictionary<string, BoardingGate>();
+
+    private static void LoadAirline()
+    {
+        string[] details = File.ReadAllLines("airlines.csv");
+        Console.WriteLine("Loading Airlines...");
+        for (int i = 1; i < details.Length; i++)
+        {
+            string[] info = details[i].Split(',');
+            Airline airline = new Airline(info[0], info[1]);
+            airlineList.Add(airline);
+
+
+        }
+        Console.WriteLine("{0} Airlines Loaded!", airlineList.Count);
+    }
+
+    private static void LoadBoardingGate()
+    {
+        string[] details = File.ReadAllLines("boardinggates.csv ");
+        Console.WriteLine("Loading Boarding Gates...");
+        for (int i = 1; i < details.Length; i++)
+        {
+            string[] info = details[i].Split(',');
         }
     }
 }

@@ -10,21 +10,22 @@ namespace PRG2_T13_04
     {
         private string name;
         private string code;
-        private Dictionary<string,Flight> flights;
+        private Dictionary<string, Flight> flights;
 
         public string Name
         { get { return name; } set { name = value; } }
 
         public string Code
-            { get { return code; } set { code = value; } }
+        { get { return code; } set { code = value; } }
 
-        public Dictionary<string,Flight> Flights
-            { get { return flights; } set { flights = value; } }
+        public Dictionary<string, Flight> Flights
+        { get { return flights; } set { flights = value; } }
 
         public bool AddFlight(Flight f)
-        { 
-            foreach(KeyValuePair<string,Flight> kvp in flights)
-            { if(kvp.Key == f.FlightNumber)
+        {
+            foreach (KeyValuePair<string, Flight> kvp in flights)
+            {
+                if (kvp.Key == f.FlightNumber)
                 {
                     return false;
                 }
@@ -61,12 +62,21 @@ namespace PRG2_T13_04
 
         public override string ToString()
         {
-            string output ="Name of AirLines: "+Name+"\nAirlines Code: "+Code+"\nFlights under Airline: ";
-            foreach (KeyValuePair <string,Flight> kvp in flights)
+            string output = "Name of AirLines: " + Name + "\nAirlines Code: " + Code + "\nFlights under Airline: ";
+            foreach (KeyValuePair<string, Flight> kvp in flights)
             { output += "\n" + kvp.Value.FlightNumber; }
             return output;
         }
 
+        public Airline()
+        { }
 
+        public Airline(string n, string c)
+        {
+            Flights = new Dictionary<string, Flight>();
+
+
+
+        }
     }
 }
