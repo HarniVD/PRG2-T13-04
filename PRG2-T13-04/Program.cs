@@ -1,6 +1,8 @@
 ﻿using PRG2_T13_04;
 internal class Program
 {
+    static List<Airline> airlineList = new List<Airline>();
+    static Dictionary<string, BoardingGate> boardingDict = new Dictionary<string, BoardingGate>();
     private static void Main(string[] args)
     {
         Dictionary<string, Flight> flightsDict = new Dictionary<string, Flight>();
