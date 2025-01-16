@@ -25,7 +25,7 @@ namespace PRG2_T13_04
         { }
 
         public override string ToString() 
-        {return base.ToString() + "\nFees for the FLight: "+CalculateFee(); }
+        {return base.ToString() + "\nFees for the FLight: "+ CalculateFees(); }
 
         
 

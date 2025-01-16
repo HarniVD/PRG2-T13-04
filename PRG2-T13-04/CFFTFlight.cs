@@ -23,7 +23,7 @@ namespace PRG2_T13_04
             return fee;
         }
         public override string ToString()
-        { return base.ToString() + "\nFees for the FLight: " + CalculateFee(); }
+        { return base.ToString() + "\nFees for the FLight: " + CalculateFees(); }
 
         public CFFTFlight() : base()
         { }
@@ -31,5 +31,4 @@ namespace PRG2_T13_04
         public CFFTFlight(string n, string o, string d, DateTime e, string s) : base(n, o, d, e, s)
         { RequestFee = 150; }
     }
-}
 }
