@@ -36,13 +36,13 @@ namespace PRG2_T13_04
             SupportsLWTT = false;
             Flight = new NORMFlight();
         }
-        public BoardingGate(string n, bool CFFT, bool DDJB, bool LWTT, Flight f) 
+        public BoardingGate(string n, bool CFFT, bool DDJB, bool LWTT) 
         {
             GateName = n;
             SupportsCFFT = CFFT;
             SupportsDDJB = DDJB;
             SupportsLWTT = LWTT;
-            Flight = f;
+            
         }
     }
 }

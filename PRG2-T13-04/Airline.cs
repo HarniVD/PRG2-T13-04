@@ -57,7 +57,25 @@ namespace PRG2_T13_04
                 fee += kvp.Value.CalculateFees();
 
             }
-            return fee;
+            double d = Flights.Count / 3;
+            if (d>= 1)
+            { fee = fee - (Math.Floor(d) * 350); }
+            if (Flights.Count>5)
+            { fee = 0.97 * fee; }
+            bool found = false;
+            bool found1 = false;
+            foreach (KeyValuePair<string, Flight> kvp in flights)
+            { if (kvp.Value.ExpectedTime.Hour<11 || kvp.Value.ExpectedTime.Hour>21)
+                { found = true; }
+            if (kvp.Value.Origin=="Dubai (DXB)" || kvp.Value.Origin == "Bangkok (BKK)" || kvp.Value.Origin == "Tokyo (NRT)")
+                {  found1 = true; }
+            }
+            if (found==true)
+            { fee = fee - 110; }
+            if (found1== true)
+            { fee = fee - 25; }
+
+                return fee;
         }
 
         public override string ToString()
@@ -73,6 +91,8 @@ namespace PRG2_T13_04
 
         public Airline(string n, string c)
         {
+            Name = n;
+            Code = c;
             Flights = new Dictionary<string, Flight>();
 
 
