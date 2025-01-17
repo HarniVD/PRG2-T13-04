@@ -8,21 +8,86 @@ internal class Program
     private static void Main(string[] args)
     {
         Dictionary<string, Flight> flightsDict = new Dictionary<string, Flight>();
-        LoadFlights(flightsDict);
         LoadAirline();
         LoadBoardingGate();
-        //ListBoardingGate();
-        DisplayFlightDetailsAirLine();
-        //ListFlights(flightsDict, airlineDict);
+        LoadFlights(flightsDict);
+        LoadAirlineFlights(flightsDict);
+
+
+        Terminal terminal5 = new Terminal();
+        terminal5.Airlines = airlineDict;
+        while (true)
+        {
+            int option = 0;
+            while (true)
+            {
+                try
+                {
+                    option = DisplayMenu();
+                    break;
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine("Please enter an integer value");
+                }
+                catch (ArgumentOutOfRangeException ex)
+                {
+                    Console.WriteLine("Please choose an option between 0 and 7");
+                }
+
+            }
+            if (option == 0)
+            {
+                break;
+            }
+            else if (option == 1)
+            {
+                ListFlights(flightsDict, airlineDict);
+            }
+            else if (option == 2)
+            {
+                ListBoardingGates();
+            }
+            else if (option == 3)
+            {
+                AssignBoardingGate(flightsDict);
+            }
+            else if (option == 5)
+            {
+                DisplayAirLineFlights();
+            }
+        }
+    }
+    public static int DisplayMenu()
+    {
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine("=============================================\r\nWelcome to Changi Airport Terminal 5\r\n=============================================\r\n1. List All Flights\r\n2. List Boarding Gates\r\n3. Assign a Boarding Gate to a Flight\r\n4. Create Flight\r\n5. Display Airline Flights\r\n6. Modify Flight Details\r\n7. Display Flight Schedule\r\n0. Exit");
+        Console.WriteLine();
+        Console.WriteLine("Please select your option:");
+        int option = 0;
+        option = Convert.ToInt32(Console.ReadLine());
+        if (!(option >= 0 && option <= 7))
+        {
+            throw new ArgumentOutOfRangeException();
+        }
+        return option;
+
     }
     public static void LoadFlights(Dictionary<string, Flight> flightsDict)
     {
         using (StreamReader sr = new StreamReader("flights.csv"))
         {
+            Console.WriteLine("Loading Flights...");
             sr.ReadLine();
             string line = sr.ReadLine();
+            int count = 0;
             while (line != null)
             {
+                count += 1;
                 string[] lineList = line.Split(',');
                 Flight newFlight = null;
                 if (lineList[lineList.Length - 1] == "DDJB")
@@ -44,6 +109,7 @@ internal class Program
                 flightsDict.Add(newFlight.FlightNumber, newFlight);
                 line = sr.ReadLine();
             }
+            Console.WriteLine($"{count} Flights Loaded!");
         }
     }
     public static void ListFlights(Dictionary<string, Flight> flightsDict, Dictionary<string, Airline> aDict)
@@ -57,7 +123,7 @@ internal class Program
         }
 
     }
-    public static Airline FindFlightAirline(Dictionary<string, Airline> aDict, Flight fl)
+    public static Airline? FindFlightAirline(Dictionary<string, Airline> aDict, Flight fl)
     {
         foreach (Airline a in aDict.Values)
         {
@@ -70,9 +136,177 @@ internal class Program
             }
         }
         Console.WriteLine("No matching airline found");
-        return new Airline();
+        return null;
     }
+    public static void LoadAirlineFlights(Dictionary<string, Flight> flightsDict)
+    {
+        foreach (Flight f in flightsDict.Values)
+        {
+            string airlineCode = f.FlightNumber[0..2];
+            foreach (Airline a in airlineDict.Values)
+            {
+                if (airlineCode == a.Code)
+                {
+                    bool result = a.AddFlight(f);
+                }
+            }
+        }
+    }
+    public static void AssignBoardingGate(Dictionary<string, Flight> flightsDict)
+    {
+        string flightNo = "";
+        string boardingName = "";
+        try
+        {
 
+            Console.WriteLine("=============================================\r\nAssign a Boarding Gate to a Flight\r\n=============================================");
+            Console.WriteLine("Enter Flight Number:");
+            flightNo = Console.ReadLine();
+            bool airlineCheck = false;
+            foreach (string airlineCode in airlineDict.Keys)
+            {
+                if (flightNo[0..2] == airlineCode)
+                {
+                    airlineCheck = true;
+                }
+            }
+            if (airlineCheck == false)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+            airlineCheck = false;
+            foreach (Flight f in flightsDict.Values)
+            {
+                if (f.FlightNumber == flightNo)
+                {
+                    string specialString = f.GetType().Name[0..4];
+                    if (specialString == "NORM")
+                    {
+                        specialString = "None";
+                    }
+                    airlineCheck = true;
+                    Console.WriteLine($"Flight Number: {f.FlightNumber}");
+                    Console.WriteLine($"Origin: {f.Origin}");
+                    Console.WriteLine($"Destination: {f.Destination}");
+                    Console.WriteLine($"Expected Time: {f.ExpectedTime}");
+                    Console.WriteLine($"Special Request Code: {specialString}");
+                }
+            }
+            if (airlineCheck == false)
+            {
+                throw new Exception($"Could not find flight {flightNo}");
+            }
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            Console.WriteLine("Invalid airline code");
+            return;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return;
+        }
+        while (true)
+        {
+            try
+            {
+                Console.WriteLine("Enter Boarding Gate Name:");
+                boardingName = Console.ReadLine();
+                bool boardingCheck = false;
+                foreach (BoardingGate bg in boardingDict.Values)
+                {
+                    if (bg.GateName == boardingName)
+                    {
+                        if (bg.Flight.FlightNumber == null)
+                        {
+                            boardingCheck = true;
+                            Console.WriteLine($"Supports DDJB: {bg.SupportsDDJB}");
+                            Console.WriteLine($"Supports CFFT: {bg.SupportsCFFT}");
+                            Console.WriteLine($"Supports LWTT: {bg.SupportsLWTT}");
+                            bg.Flight = flightsDict[flightNo];
+                            break;
+                        }
+                        else
+                        {
+                            throw new Exception();
+                        }
+                    }
+                }
+                if (boardingCheck == false)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+                break;
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                Console.WriteLine($"Could not find boarding gate");
+                return;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Boarding gate already assigned");
+                continue;
+            }
+        }
+        while (true)
+        {
+            Console.WriteLine("Would you like to update the status of the flight? (Y/N)");
+            string updateChoice = Console.ReadLine();
+            if (updateChoice == "N")
+            {
+                flightsDict[flightNo].Status = "On Time";
+                Console.WriteLine($"Flight {flightNo} has been assigned to Boarding Gate {boardingName}!");
+                break;
+            }
+            else if (updateChoice == "Y")
+            {
+                Console.WriteLine("1. Delayed\r\n2. Boarding\r\n3. On Time");
+                Console.WriteLine("Please select the new status of the flight:");
+                int newStatus = 0;
+                while (true)
+                {
+                    try
+                    {
+                        newStatus = Convert.ToInt32(Console.ReadLine());
+                        if (!(newStatus >= 1 && newStatus <= 3))
+                        {
+                            throw new Exception();
+                        }
+                        break;
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Please enter an integer");
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Please enter an option between 1 and 3");
+                    }
+                }
+                if (newStatus == 1)
+                {
+                    flightsDict[flightNo].Status = "Delayed";
+                }
+                else if (newStatus == 2)
+                {
+                    flightsDict[flightNo].Status = "Boarding";
+                }
+                else if (newStatus == 3)
+                {
+                    flightsDict[flightNo].Status = "On Time";
+                }
+                Console.WriteLine($"Flight {flightNo} has been assigned to Boarding Gate {boardingName}!");
+                break;
+            }
+            else
+            {
+                Console.WriteLine("Invalid Option");
+                continue;
+            }
+        }
+    }
 
     private static void LoadAirline()
     {
@@ -91,18 +325,27 @@ internal class Program
 
     private static void LoadBoardingGate()
     {
+        // Errors: compile error with creation of boardinggate because no flight object given in parameters,
+        // Changes: Created non-parameterized constructor and assigned corresponding values
+        // Errors: csv file data given does not match order given in class diagram; Order for csv is DDJB,CFFT,LWTT. Order for constructor is CFFT,DDJB,LWTT
+        // Changes: fixed info order
+        // Note: Sample output for this does not match the csv file given (A10 - A13 is CFFT for sample output but DDJB in the csv file)
         string[] details = File.ReadAllLines("boardinggates.csv ");
         Console.WriteLine("Loading Boarding Gates...");
         for (int i = 1; i < details.Length; i++)
         {
             string[] info = details[i].Split(',');
-            BoardingGate boardinggate = new BoardingGate(info[0], Convert.ToBoolean(info[1]), Convert.ToBoolean(info[2]), Convert.ToBoolean(info[3]));
+            BoardingGate boardinggate = new BoardingGate();
+            boardinggate.GateName = info[0];
+            boardinggate.SupportsCFFT = Convert.ToBoolean(info[2]);
+            boardinggate.SupportsDDJB = Convert.ToBoolean(info[1]);
+            boardinggate.SupportsLWTT = Convert.ToBoolean(info[3]);
             boardingDict.Add(info[0], boardinggate);
         }
         Console.WriteLine("{0} Boarding Gates Loaded!", boardingDict.Count);
     }
 
-    private static void ListBoardingGate()
+    private static void ListBoardingGates()
     {
         Console.WriteLine("=============================================");
         Console.WriteLine("List of Boarding Gates for Changi Airport Terminal 5");
@@ -117,7 +360,8 @@ internal class Program
 
     }
 
-    private static void DisplayFlightDetailsAirLine()
+    // Changed DisplayFlightDetailsAirLine to DisplayAirlineFlights()
+    private static void DisplayAirLineFlights()
     {
         Console.WriteLine("{0,-16}{1,-17}", "Airline Code", "Airline Name");
         foreach (KeyValuePair<string, Airline> kvp in airlineDict)

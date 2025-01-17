@@ -23,7 +23,8 @@ namespace PRG2_T13_04
 
         public bool AddFlight(Flight f)
         {
-            foreach (KeyValuePair<string, Flight> kvp in flights)
+            // changed flights to Flights
+            foreach (KeyValuePair<string, Flight> kvp in Flights)
             {
                 if (kvp.Key == f.FlightNumber)
                 {
