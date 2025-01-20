@@ -15,10 +15,12 @@ namespace PRG2_T13_04
 
         private bool supportsDDJB;
         public bool SupportsDDJB { get; set; }
+        
         private bool supportsLWTT;
         public bool SupportsLWTT { get; set; }
+        
         private Flight flight;
-        public Flight Flight { get; set; }
+        public Flight Flight { get { return flight; } set { flight = value; } }
 
         public double CalculateFees()
         {
@@ -34,7 +36,7 @@ namespace PRG2_T13_04
             SupportsCFFT = false;
             SupportsDDJB = false;
             SupportsLWTT = false;
-            Flight = new NORMFlight();
+            
         }
         public BoardingGate(string n, bool CFFT, bool DDJB, bool LWTT) 
         {
@@ -44,5 +46,6 @@ namespace PRG2_T13_04
             SupportsLWTT = LWTT;
             
         }
+
     }
 }
