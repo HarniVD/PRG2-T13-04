@@ -20,7 +20,7 @@ namespace PRG2_T13_04
         public bool SupportsLWTT { get; set; }
         
         private Flight flight;
-        public Flight Flight { get { return flight; } set { flight = value; } }
+        public Flight Flight { get; set; }
 
         public double CalculateFees()
         {

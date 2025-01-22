@@ -419,6 +419,21 @@ internal class Program
                 { Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}", f.Value.FlightNumber, kvp.Value.Name, f.Value.Origin, f.Value.Destination, f.Value.ExpectedTime); }
                 Console.Write("Choose an existing Flight to modify or delete: ");
                 string? flight = Console.ReadLine();
+                /*string bg = "Unassigned";
+                foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
+
+                {
+
+                    if (boarding.Value.Flight.FlightNumber == flight)
+                    {
+                       bg = boarding.Value.GateName;
+
+                    }
+                    else
+                    { continue; }
+
+                }
+                */
                 foreach (KeyValuePair<string, Flight> f in kvp.Value.Flights)
                 {
                     if (f.Value.FlightNumber == flight)
@@ -460,6 +475,7 @@ internal class Program
                             {
                                 Console.WriteLine("Enter Special Request Code: ");
                                 string s = Console.ReadLine();
+                                
 
 
                             }
@@ -483,18 +499,9 @@ internal class Program
                                 specialString = "None";
                             }
                             Console.WriteLine("Special Request Code: {0}", specialString);
-                            foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
-
-                            {
-                                
-                                if (boarding.Value.Flight.FlightNumber == flight)
-                                {
-                                    Console.WriteLine("Boarding Gate: {0}", boarding.Value.GateName);
-                                    
-                                }
-
-                            }
+                            //Console.WriteLine("Boarding Gate: {0}", bg);
                             
+
 
                         }
 
