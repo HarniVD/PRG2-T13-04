@@ -224,7 +224,7 @@ internal class Program
                 {
                     if (bg.GateName == boardingName)
                     {
-                        if (bg.Flight.FlightNumber == null)
+                        if (bg.Flight == null)
                         {
                             boardingCheck = true;
                             Console.WriteLine($"Supports DDJB: {bg.SupportsDDJB}");

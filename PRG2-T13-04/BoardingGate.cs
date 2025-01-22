@@ -36,7 +36,7 @@ namespace PRG2_T13_04
             SupportsCFFT = false;
             SupportsDDJB = false;
             SupportsLWTT = false;
-            
+            Flight = null;
         }
         public BoardingGate(string n, bool CFFT, bool DDJB, bool LWTT) 
         {
@@ -44,7 +44,7 @@ namespace PRG2_T13_04
             SupportsCFFT = CFFT;
             SupportsDDJB = DDJB;
             SupportsLWTT = LWTT;
-            
+            Flight = null;
         }
 
     }
