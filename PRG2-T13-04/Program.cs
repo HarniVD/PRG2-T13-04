@@ -387,7 +387,28 @@ internal class Program
                 foreach (KeyValuePair<string, Flight> flight in kvp.Value.Flights)
                 {
                     if (flight.Value.FlightNumber == number)
-                    {  }
+                    {
+                        Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}{5,-11}{6,-23}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival ", "Status", "Boarding Gate");
+                        string bg = "Unassigned";
+                        foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
+
+                        {
+                            if (boarding.Value.Flight != null)
+                            {
+                                if (boarding.Value.Flight.FlightNumber == number)
+                                {
+                                    bg = boarding.Value.GateName;
+
+                                }
+                                else
+                                { continue; }
+
+
+                            }
+
+                        }
+                        Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-26}{5,-11}{6,-23}", number, kvp.Value.Name, flight.Value.Origin, flight.Value.Destination, flight.Value.ExpectedTime, flight.Value.Status, bg);
+                    }
 
                 }
             }
@@ -419,22 +440,25 @@ internal class Program
                 { Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}", f.Value.FlightNumber, kvp.Value.Name, f.Value.Origin, f.Value.Destination, f.Value.ExpectedTime); }
                 Console.Write("Choose an existing Flight to modify or delete: ");
                 string? flight = Console.ReadLine();
-                /*string bg = "Unassigned";
+                string bg = "Unassigned";
                 foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
 
                 {
-
-                    if (boarding.Value.Flight.FlightNumber == flight)
+                    if (boarding.Value.Flight != null)
                     {
-                       bg = boarding.Value.GateName;
+                        if (boarding.Value.Flight.FlightNumber == flight)
+                        {
+                            bg = boarding.Value.GateName;
+
+                        }
+                        else
+                        { continue; }
+
 
                     }
-                    else
-                    { continue; }
-
                 }
-                */
-                foreach (KeyValuePair<string, Flight> f in kvp.Value.Flights)
+
+                    foreach (KeyValuePair<string, Flight> f in kvp.Value.Flights)
                 {
                     if (f.Value.FlightNumber == flight)
                     {
@@ -499,7 +523,7 @@ internal class Program
                                 specialString = "None";
                             }
                             Console.WriteLine("Special Request Code: {0}", specialString);
-                            //Console.WriteLine("Boarding Gate: {0}", bg);
+                            Console.WriteLine("Boarding Gate: {0}", bg);
                             
 
 
