@@ -1,5 +1,6 @@
 ﻿using PRG2_T13_04;
 using System.Collections.Generic;
+using System.Transactions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 internal class Program
 {
@@ -458,7 +459,7 @@ internal class Program
                     }
                 }
 
-                    foreach (KeyValuePair<string, Flight> f in kvp.Value.Flights)
+                foreach (KeyValuePair<string, Flight> f in kvp.Value.Flights)
                 {
                     if (f.Value.FlightNumber == flight)
                     {
@@ -466,6 +467,7 @@ internal class Program
                         Console.WriteLine("2.Delete Flight");
                         Console.WriteLine("Choose an option: ");
                         int option = Convert.ToInt32(Console.ReadLine());
+                        //If the option is Modify Flight:
                         if (option == 1)
                         {
                             Console.WriteLine("1. Modify Basic Information");
@@ -498,18 +500,45 @@ internal class Program
                             if (opt == 3)
                             {
                                 Console.WriteLine("Enter Special Request Code: ");
-                                string s = Console.ReadLine();
-                                
+                                string? s = Console.ReadLine();
+                                string? origin = f.Value.Origin;
+                                string? destination = f.Value.Destination;
+                                DateTime datetime = f.Value.ExpectedTime;
+                                string? status = f.Value.Status;
+                                flightsDict.Remove(flight);
+                                if (s == "DDJB")
+                                {
+                                    Flight c = new DDJBFlight(flight, origin, destination, datetime, status);
+                                    flightsDict.Add(flight, c);
+                                }
+                                else if (s == "NORM")
+                                {
+                                    Flight c = new NORMFlight(flight, origin, destination, datetime, status);
+                                    flightsDict.Add(flight, c);
+                                }
+                                else if (s == "CFFT")
+                                {
+                                    Flight c = new CFFTFlight(flight, origin, destination, datetime, status);
+                                    flightsDict.Add(flight, c);
+                                }
+                                else if (s == "LWTT")
+                                {
+                                    Flight c = new LWTTFlight(flight, origin, destination, datetime, status);
+                                    flightsDict.Add(flight, c);
+                                }
 
 
                             }
+
 
                             if (opt == 4)
                             {
-
+                                Console.WriteLine("Enter Boarding Gate Number: ");
+                                string? boarding_gate = Console.ReadLine();
+                                bg = boarding_gate;
 
                             }
-
+                            // Displaying of Information about Flights
                             Console.WriteLine("Flight Updated!");
                             Console.WriteLine("Flight Number: {0}", f.Value.FlightNumber);
                             Console.WriteLine("Airline Name: {0}", kvp.Value.Name);
@@ -517,18 +546,24 @@ internal class Program
                             Console.WriteLine("Destination: {0}", f.Value.Destination);
                             Console.WriteLine("Expected Departure/Arrival Time: {0}", f.Value.ExpectedTime);
                             Console.WriteLine("Status: {0}", f.Value.Status);
-                            string specialString = f.Value.GetType().Name[0..4];
-                            if (specialString == "NORM")
-                            {
-                                specialString = "None";
-                            }
-                            Console.WriteLine("Special Request Code: {0}", specialString);
+                            foreach(KeyValuePair<string,Flight> flights in flightsDict)
+                            {if(flights.Key==flight)
+                                {
+                                    string specialString = flights.Value.GetType().Name[0..4];
+                                    if (specialString == "NORM")
+                                    {
+                                        specialString = "None";
+                                    }
+                                    Console.WriteLine("Special Request Code: {0}", specialString);
+                                }
+                                
+                            }  
                             Console.WriteLine("Boarding Gate: {0}", bg);
                             
 
 
                         }
-
+                        //If the option is Delete Flight
                         else if (option == 2 )
                         { Console.WriteLine("Are you sure you want to delete [Y/N]:");
                           string confirm = Console.ReadLine();
