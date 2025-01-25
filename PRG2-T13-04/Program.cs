@@ -1,5 +1,6 @@
 ﻿using PRG2_T13_04;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Transactions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 internal class Program
@@ -8,6 +9,8 @@ internal class Program
     static Dictionary<string, BoardingGate> boardingDict = new Dictionary<string, BoardingGate>();
     // Changed the Flights Dictionary to a static variable
     static Dictionary<string, Flight> flightsDict = new Dictionary<string, Flight>();
+    static Queue<Flight> queue = new Queue<Flight>();
+    static List<BoardingGate> listBG = new List<BoardingGate>();
     private static void Main(string[] args)
     {
 
@@ -35,7 +38,7 @@ internal class Program
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
-                    Console.WriteLine("Please choose an option between 0 and 7");
+                    Console.WriteLine("Please choose an option between 0 and 9");
                 }
 
             }
@@ -55,6 +58,22 @@ internal class Program
             {
                 AssignBoardingGate(flightsDict);
             }
+            else if (option == 4)
+            {
+                while (true)
+                {
+                    string? opt = AddFlight(flightsDict);
+                    if (opt == "Y")
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+            }
             else if (option == 5)
             {
                 DisplayAirLineFlights();
@@ -62,6 +81,76 @@ internal class Program
             else if (option == 6)
             {
                 ModifyFlight();
+            }
+            else if (option == 7)
+            {
+                List<Flight> sortingList = new List<Flight>();
+                foreach (KeyValuePair<string, Flight> kvp in flightsDict)
+                {
+                    sortingList.Add(kvp.Value);
+                }
+                sortingList.Sort();
+                Dictionary<string, Flight> sortedDict = new Dictionary<string, Flight>();
+                foreach (Flight f in sortingList)
+                {
+                    sortedDict.Add(f.FlightNumber, f);
+                }
+                Console.WriteLine("{0,-18}{1,-22}{2,-22}{3,-22}{4,-30}{5,-14}{6,-22}{7,-22}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival", "Status", "Special Request Code", "Boarding Gate");
+                foreach (KeyValuePair<string, Flight> kvp in sortedDict)
+                {
+                    string airlineName = FindFlightAirline(airlineDict, kvp.Value).Name;
+                    string code = kvp.Value.GetType().Name[0..4];
+                    if (code == "NORM")
+                    {
+                        code = "";
+                    }
+                    string gateName = "";
+                    foreach (BoardingGate bg in boardingDict.Values)
+                    {
+                        if (bg.Flight != null)
+                        {
+                            if (bg.Flight.FlightNumber == kvp.Key)
+                            {
+                                gateName = bg.GateName;
+                            }
+                        }
+                    }
+                    Console.WriteLine("{0,-18}{1,-22}{2,-22}{3,-22}{4,-30}{5,-14}{6,-22}{7,-22}", kvp.Value.FlightNumber, airlineName, kvp.Value.Origin, kvp.Value.Destination, kvp.Value.ExpectedTime, kvp.Value.Status, code, gateName);
+
+                }
+            }
+            else if (option == 8)
+            {
+                foreach (BoardingGate bg in boardingDict.Values)
+                {
+                    if (bg.Flight == null && !(listBG.Contains(bg)))
+                    {
+                        listBG.Add(bg);
+                    }
+                }
+                foreach (Flight flight in flightsDict.Values)
+                {
+                    bool assigned = false;
+                    foreach (BoardingGate bg in boardingDict.Values)
+                    {
+                        if (bg.Flight != null)
+                        {
+                            if (bg.Flight.FlightNumber == flight.FlightNumber)
+                            {
+                                assigned = true;
+                            }
+                        }
+                    }
+                    if (assigned == false && !(queue.Contains(flight)))
+                    {
+                        queue.Enqueue(flight);
+                    }
+                }
+                ProcessFlights(queue, listBG);
+            }
+            else
+            {
+
             }
         }
     }
@@ -72,12 +161,12 @@ internal class Program
         Console.WriteLine();
         Console.WriteLine();
         Console.WriteLine();
-        Console.WriteLine("=============================================\r\nWelcome to Changi Airport Terminal 5\r\n=============================================\r\n1. List All Flights\r\n2. List Boarding Gates\r\n3. Assign a Boarding Gate to a Flight\r\n4. Create Flight\r\n5. Display Airline Flights\r\n6. Modify Flight Details\r\n7. Display Flight Schedule\r\n0. Exit");
+        Console.WriteLine("=============================================\r\nWelcome to Changi Airport Terminal 5\r\n=============================================\r\n1. List All Flights\r\n2. List Boarding Gates\r\n3. Assign a Boarding Gate to a Flight\r\n4. Create Flight\r\n5. Display Airline Flights\r\n6. Modify Flight Details\r\n7. Display Flight Schedule\r\n8. Process unassigned flights to boarding gates\r\n9. Display total fee per airline for the day\r\n0. Exit");
         Console.WriteLine();
         Console.WriteLine("Please select your option:");
         int option = 0;
         option = Convert.ToInt32(Console.ReadLine());
-        if (!(option >= 0 && option <= 7))
+        if (!(option >= 0 && option <= 9))
         {
             throw new ArgumentOutOfRangeException();
         }
@@ -186,6 +275,17 @@ internal class Program
             {
                 if (f.FlightNumber == flightNo)
                 {
+                    foreach (BoardingGate bg in boardingDict.Values)
+                    {
+                        if (bg.Flight != null)
+                        {
+                            if (bg.Flight.FlightNumber == flightNo)
+                            {
+                                Console.WriteLine("This flight is already assigned");
+                                return;
+                            }
+                        }
+                    }
                     string specialString = f.GetType().Name[0..4];
                     if (specialString == "NORM")
                     {
@@ -231,7 +331,6 @@ internal class Program
                             Console.WriteLine($"Supports DDJB: {bg.SupportsDDJB}");
                             Console.WriteLine($"Supports CFFT: {bg.SupportsCFFT}");
                             Console.WriteLine($"Supports LWTT: {bg.SupportsLWTT}");
-                            bg.Flight = flightsDict[flightNo];
                             break;
                         }
                         else
@@ -243,6 +342,38 @@ internal class Program
                 if (boardingCheck == false)
                 {
                     throw new ArgumentOutOfRangeException();
+                }
+                string code = flightsDict[flightNo].GetType().Name[0..4];
+                bool supports = false;
+                if (code == "NORM")
+                {
+                    supports = true;
+                }
+                else if (code == "DDJB")
+                {
+                    if (boardingDict[boardingName].SupportsDDJB == true)
+                    {
+                        supports = true;
+                    }
+                }
+                else if (code == "CFFT")
+                {
+                    if (boardingDict[boardingName].SupportsCFFT == true)
+                    {
+                        supports = true;
+                    }
+                }
+                else
+                {
+                    if (boardingDict[boardingName].SupportsLWTT == true)
+                    {
+                        supports = true;
+                    }
+                }
+                if (supports == false)
+                {
+                    Console.WriteLine($"Boarding gate does not support special request code {code}");
+                    return;
                 }
                 break;
             }
@@ -257,61 +388,55 @@ internal class Program
                 continue;
             }
         }
-        while (true)
+        Console.WriteLine("Would you like to update the status of the flight? (Y/N)");
+        string updateChoice = Console.ReadLine();
+        if (updateChoice == "N")
         {
-            Console.WriteLine("Would you like to update the status of the flight? (Y/N)");
-            string updateChoice = Console.ReadLine();
-            if (updateChoice == "N")
+            flightsDict[flightNo].Status = "On Time";
+            boardingDict[boardingName].Flight = flightsDict[flightNo];
+            Console.WriteLine($"Flight {flightNo} has been assigned to Boarding Gate {boardingName}!");
+        }
+        else if (updateChoice == "Y")
+        {
+            Console.WriteLine("1. Delayed\r\n2. Boarding\r\n3. On Time");
+            Console.WriteLine("Please select the new status of the flight:");
+            int newStatus = 0;
+            try
+            {
+                newStatus = Convert.ToInt32(Console.ReadLine());
+                if (!(newStatus >= 1 && newStatus <= 3))
+                {
+                    throw new Exception();
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Please enter an integer");
+                return;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Please enter an option between 1 and 3");
+                return;
+            }
+            if (newStatus == 1)
+            {
+                flightsDict[flightNo].Status = "Delayed";
+            }
+            else if (newStatus == 2)
+            {
+                flightsDict[flightNo].Status = "Boarding";
+            }
+            else if (newStatus == 3)
             {
                 flightsDict[flightNo].Status = "On Time";
-                Console.WriteLine($"Flight {flightNo} has been assigned to Boarding Gate {boardingName}!");
-                break;
             }
-            else if (updateChoice == "Y")
-            {
-                Console.WriteLine("1. Delayed\r\n2. Boarding\r\n3. On Time");
-                Console.WriteLine("Please select the new status of the flight:");
-                int newStatus = 0;
-                while (true)
-                {
-                    try
-                    {
-                        newStatus = Convert.ToInt32(Console.ReadLine());
-                        if (!(newStatus >= 1 && newStatus <= 3))
-                        {
-                            throw new Exception();
-                        }
-                        break;
-                    }
-                    catch (FormatException)
-                    {
-                        Console.WriteLine("Please enter an integer");
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine("Please enter an option between 1 and 3");
-                    }
-                }
-                if (newStatus == 1)
-                {
-                    flightsDict[flightNo].Status = "Delayed";
-                }
-                else if (newStatus == 2)
-                {
-                    flightsDict[flightNo].Status = "Boarding";
-                }
-                else if (newStatus == 3)
-                {
-                    flightsDict[flightNo].Status = "On Time";
-                }
-                Console.WriteLine($"Flight {flightNo} has been assigned to Boarding Gate {boardingName}!");
-                break;
-            }
-            else
-            {
-                Console.WriteLine("Invalid Option");
-                continue;
-            }
+            boardingDict[boardingName].Flight = flightsDict[flightNo];
+            Console.WriteLine($"Flight {flightNo} has been assigned to Boarding Gate {boardingName}!");
+        }
+        else
+        {
+            Console.WriteLine("Invalid Option");
         }
     }
 
@@ -590,5 +715,185 @@ internal class Program
                 }
             }
         }
+    }
+    public static string AddFlight(Dictionary<string, Flight> flightsDict)
+    {
+        Console.Write("Enter Flight Number: ");
+        string? flightNo = null;
+        DateTime? expectedTime = null;
+        try
+        {
+            flightNo = Console.ReadLine();
+            if (flightsDict.ContainsKey(flightNo))
+            {
+                Console.WriteLine("Flight with same Flight Number already exists.");
+                return "";
+            }
+            bool airlineCheck = false;
+            foreach (string airlineCode in airlineDict.Keys)
+            {
+                if (flightNo[0..2] == airlineCode)
+                {
+                    airlineCheck = true;
+                }
+            }
+            if (airlineCheck == false)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+            if (flightNo.Length > 6)
+            {
+                throw new Exception();
+            }
+        }
+        catch(ArgumentOutOfRangeException)
+        {
+            Console.WriteLine("Invalid airline code");
+            return "";
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("Flight Number must be <1000");
+            return "";
+        }
+
+        Console.Write("Enter Origin: ");
+        string? origin = Console.ReadLine();
+        Console.Write("Enter Destination: ");
+        string? destination = Console.ReadLine(); Console.Write("Enter Expected Departure / Arrival Time(dd / mm / yyyy hh: mm): ");
+        try
+        {
+            expectedTime = Convert.ToDateTime(Console.ReadLine());
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("Incorrect Format. Please enter the time in the format above.");
+            return "";
+        }
+
+        Console.Write("Enter Special Request Code(CFFT/ DDJB / LWTT / None): ");
+        try
+        {
+            string? code = Console.ReadLine();
+            Flight newFlight = null;
+            if (code == "None")
+            {
+                newFlight = new NORMFlight(flightNo, origin, destination, expectedTime.Value, "Scheduled");
+            }
+            else if (code == "CCFT")
+            {
+                newFlight = new CFFTFlight(flightNo, origin, destination, expectedTime.Value, "Scheduled");
+            }
+            else if (code == "DDJB")
+            {
+                newFlight = new DDJBFlight(flightNo, origin, destination, expectedTime.Value, "Scheduled");
+            }
+            else if (code == "LWTT")
+            {
+                newFlight = new LWTTFlight(flightNo, origin, destination, expectedTime.Value, "Scheduled");
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+            flightsDict.Add(flightNo, newFlight);
+            foreach (Airline a in airlineDict.Values)
+            {
+                if (a.Code == flightNo[0..2])
+                {
+                    a.AddFlight(newFlight);
+                }
+            }
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            Console.WriteLine("Please enter a valid Special Request Code or 'None'");
+            return "";
+        }
+        Console.WriteLine($"Flight {flightNo} has been added");
+        Console.WriteLine("Would you like to add another flight? (Y/N)");
+        string? option = Console.ReadLine();
+        return option;
+    }
+    static double count = 0;
+    public static void ProcessFlights(Queue<Flight> queue, List<BoardingGate> listBG)
+    {
+        double tempCount2 = 0;
+        int flightCount = queue.Count;
+        int gateCount = listBG.Count;
+        Console.WriteLine();
+        Console.WriteLine($"Flights with no assigned boarding gate: {flightCount}");
+        Console.WriteLine($"Boarding gates with no assigned flight number: {gateCount}");
+        Console.WriteLine();
+        Console.WriteLine("{0,-18}{1,-22}{2,-22}{3,-22}{4,-35}{5,-24}{6,-22}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure/Arrival Time", "Special Request Code", "Boarding Gate");
+        int qLength = queue.Count;
+        for (int i = 0; i < qLength; i++)
+        {
+            Flight nextFlight = queue.Dequeue();
+            BoardingGate nextBG = null;
+            string code = nextFlight.GetType().Name[0..4];
+            if (code == "CFFT")
+            {
+                foreach (BoardingGate bg in listBG)
+                {
+                    if (bg.SupportsCFFT == true)
+                    {
+                        nextBG = bg;
+                        break;
+                    }
+                }
+            }
+            else if (code == "DDJB")
+            {
+                foreach (BoardingGate bg in listBG)
+                {
+                    if (bg.SupportsDDJB == true)
+                    {
+                        nextBG = bg;
+                        break;
+                    }
+                }
+            }
+            else if (code == "LWTT")
+            {
+                foreach (BoardingGate bg in listBG)
+                {
+                    if (bg.SupportsLWTT == true)
+                    {
+                        nextBG = bg;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                foreach (BoardingGate bg in listBG)
+                {
+                    if (bg.SupportsLWTT == false && bg.SupportsDDJB == false && bg.SupportsLWTT == false)
+                    {
+                        nextBG = bg;
+                    }
+                }
+            }
+            boardingDict[nextBG.GateName].Flight = nextFlight;
+            flightsDict[nextFlight.FlightNumber].Status = "On Time";
+            listBG.Remove(nextBG);
+            string airlineName = FindFlightAirline(airlineDict, nextFlight).Name;
+            if (code == "NORM")
+            {
+                code = "";
+            }
+            Console.WriteLine("{0,-18}{1,-22}{2,-22}{3,-22}{4,-35}{5,-24}{6,-22}", nextFlight.FlightNumber, airlineName, nextFlight.Origin, nextFlight.Destination, nextFlight.ExpectedTime, code, nextBG.GateName);
+            count += 1;
+        }
+        foreach (BoardingGate bg in boardingDict.Values)
+        {
+            if (bg.Flight != null)
+            {
+                tempCount2 += 1;
+            }
+        }
+        Console.WriteLine($"Total number of Flights and Boarding Gates processed and assigned: {count}");
+        Console.WriteLine($"{count/tempCount2 * 100:F2}% of currently assigned flights and boarding gates were processed automatically");
     }
 }
