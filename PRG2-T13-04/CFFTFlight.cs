@@ -1,4 +1,12 @@
-﻿using System;
+﻿//==========================================================
+// Student Number : S10268170
+// Student Name : Chan Jing Hui
+// Partner Name : Vijayan Devi Harni
+//==========================================================
+
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
