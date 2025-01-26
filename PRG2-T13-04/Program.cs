@@ -1,6 +1,7 @@
 ﻿using PRG2_T13_04;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
+using System.Reflection.Metadata.Ecma335;
 using System.Transactions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 internal class Program
@@ -119,6 +120,7 @@ internal class Program
 
                 }
             }
+           
             else if (option == 8)
             {
                 foreach (BoardingGate bg in boardingDict.Values)
@@ -154,6 +156,7 @@ internal class Program
             }
         }
     }
+    //Displaying of Menu
     public static int DisplayMenu()
     {
         Console.WriteLine();
@@ -173,6 +176,8 @@ internal class Program
         return option;
 
     }
+
+    // Loading of Flights
     public static void LoadFlights(Dictionary<string, Flight> flightsDict)
     {
         using (StreamReader sr = new StreamReader("flights.csv"))
@@ -208,6 +213,8 @@ internal class Program
             Console.WriteLine($"{count} Flights Loaded!");
         }
     }
+
+    //Feature 1 done
     public static void ListFlights(Dictionary<string, Flight> flightsDict, Dictionary<string, Airline> aDict)
     {
         Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival");
@@ -219,6 +226,7 @@ internal class Program
         }
 
     }
+    // For Finding of Airline
     public static Airline? FindFlightAirline(Dictionary<string, Airline> aDict, Flight fl)
     {
         foreach (Airline a in aDict.Values)
@@ -234,6 +242,8 @@ internal class Program
         Console.WriteLine("No matching airline found");
         return null;
     }
+
+    // Loading of Airline Flights
     public static void LoadAirlineFlights(Dictionary<string, Flight> flightsDict)
     {
         foreach (Flight f in flightsDict.Values)
@@ -248,6 +258,8 @@ internal class Program
             }
         }
     }
+
+    // Feature 3 with Data Validation done
     public static void AssignBoardingGate(Dictionary<string, Flight> flightsDict)
     {
         string? flightNo = "";
@@ -440,6 +452,7 @@ internal class Program
         }
     }
 
+    //Loading of Airline
     private static void LoadAirline()
     {
         string[] details = File.ReadAllLines("airlines.csv");
@@ -454,7 +467,8 @@ internal class Program
         }
         Console.WriteLine("{0} Airlines Loaded!", airlineDict.Count);
     }
-
+    
+    //Loading of Boarding Gates
     private static void LoadBoardingGate()
     {
         string[] details = File.ReadAllLines("boardinggates.csv ");
@@ -472,6 +486,7 @@ internal class Program
         Console.WriteLine("{0} Boarding Gates Loaded!", boardingDict.Count);
     }
 
+    //Feature 2 
     private static void ListBoardingGates()
     {
         Console.WriteLine("=============================================");
@@ -487,9 +502,9 @@ internal class Program
 
     }
 
-
+    // Feature 5 with Data Validation done 
     private static void DisplayAirLineFlights()
-    {
+    {  
         Console.WriteLine("{0,-16}{1,-17}", "Airline Code", "Airline Name");
         foreach (KeyValuePair<string, Airline> kvp in airlineDict)
         {
@@ -499,51 +514,75 @@ internal class Program
         Console.Write("Enter Airline Code: ");
         string? code = Console.ReadLine();
         Console.WriteLine("=============================================");
+        bool airline = false;
         foreach (KeyValuePair<string, Airline> kvp in airlineDict)
-        {
-            if (kvp.Value.Code == code)
             {
-                Console.WriteLine("List of Flights for {0}", kvp.Value.Name);
-                Console.WriteLine("=============================================");
-                Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival");
-                foreach (KeyValuePair<string, Flight> f in kvp.Value.Flights)
-                { Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}", f.Value.FlightNumber, kvp.Value.Name, f.Value.Origin, f.Value.Destination, f.Value.ExpectedTime); }
-                Console.Write("Enter Flight Number: ");
-                string? number = Console.ReadLine();
-                foreach (KeyValuePair<string, Flight> flight in kvp.Value.Flights)
+                if (kvp.Value.Code == code)
                 {
-                    if (flight.Value.FlightNumber == number)
+                    airline = true;
+                    bool run = true;
+                    while (run == true)
                     {
-                        Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}{5,-11}{6,-23}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival ", "Status", "Boarding Gate");
-                        string bg = "Unassigned";
-                        foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
-
+                        Console.WriteLine("List of Flights for {0}", kvp.Value.Name);
+                        Console.WriteLine("=============================================");
+                        Console.WriteLine("{0,-22}{1,-22}{2,-22}", "Flight Number", "Origin", "Destination");
+                        foreach (KeyValuePair<string, Flight> f in kvp.Value.Flights)
+                        { Console.WriteLine("{0,-22}{1,-22}{2,-22}", f.Value.FlightNumber,  f.Value.Origin, f.Value.Destination); }
+                        Console.Write("Enter Flight Number: ");
+                        string? number = Console.ReadLine();
+                        bool found = false;
+                        foreach (KeyValuePair<string, Flight> flight in kvp.Value.Flights)
                         {
-                            if (boarding.Value.Flight != null)
+                            if (flight.Value.FlightNumber == number)
                             {
-                                if (boarding.Value.Flight.FlightNumber == number)
+                                Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}{5,-11}{6,-23}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival ", "Status", "Boarding Gate");
+                                string bg = "Unassigned";
+                                foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
+
                                 {
-                                    bg = boarding.Value.GateName;
+                                    if (boarding.Value.Flight != null)
+                                    {
+                                        if (boarding.Value.Flight.FlightNumber == number)
+                                        {
+                                            bg = boarding.Value.GateName;
+
+                                        }
+                                        else
+                                        { continue; }
+
+
+                                    }
 
                                 }
-                                else
-                                { continue; }
-
-
+                                Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-26}{5,-11}{6,-23}", number, kvp.Value.Name, flight.Value.Origin, flight.Value.Destination, flight.Value.ExpectedTime, flight.Value.Status, bg);
+                                found = true;
+                                run = false;
+                                break;
+                                
                             }
-
                         }
-                        Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-26}{5,-11}{6,-23}", number, kvp.Value.Name, flight.Value.Origin, flight.Value.Destination, flight.Value.ExpectedTime, flight.Value.Status, bg);
+
+                        if (found == false)
+                        { Console.WriteLine("Flight number cannot be found");
+                            continue;
+                        }
                     }
 
                 }
-            }
         }
+        if (airline == false)
+        { Console.WriteLine("Airline is not found");
+        }
+       
 
 
 
     }
 
+
+
+
+    //Feature 6 with Data Validation done
     private static void ModifyFlight()
     {
         Console.WriteLine("{0,-16}{1,-17}", "Airline Code", "Airline Name");
@@ -554,11 +593,13 @@ internal class Program
 
         Console.Write("Enter Airline Code: ");
         string? code = Console.ReadLine();
+        bool find = false;
         Console.WriteLine("=============================================");
         foreach (KeyValuePair<string, Airline> kvp in airlineDict)
         {
             if (kvp.Value.Code == code)
             {
+                find = true;
                 Console.WriteLine("List of Flights for {0}", kvp.Value.Name);
                 Console.WriteLine("=============================================");
                 Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival");
@@ -626,31 +667,40 @@ internal class Program
                             {
                                 Console.WriteLine("Enter Special Request Code: ");
                                 string? s = Console.ReadLine();
-                                string? origin = f.Value.Origin;
-                                string? destination = f.Value.Destination;
-                                DateTime datetime = f.Value.ExpectedTime;
-                                string? status = f.Value.Status;
-                                flightsDict.Remove(flight);
-                                if (s == "DDJB")
+                                if (s != "DDJB" || s != "CFFT" || s != "LWTT")
                                 {
-                                    Flight c = new DDJBFlight(flight, origin, destination, datetime, status);
-                                    flightsDict.Add(flight, c);
+                                    Console.WriteLine("Invalid Special Request Code.");
+                                    break;
                                 }
-                                else if (s == "NORM")
+                                else
                                 {
-                                    Flight c = new NORMFlight(flight, origin, destination, datetime, status);
-                                    flightsDict.Add(flight, c);
+                                    string? origin = f.Value.Origin;
+                                    string? destination = f.Value.Destination;
+                                    DateTime datetime = f.Value.ExpectedTime;
+                                    string? status = f.Value.Status;
+                                    flightsDict.Remove(flight);
+                                    if (s == "DDJB")
+                                    {
+                                        Flight c = new DDJBFlight(flight, origin, destination, datetime, status);
+                                        flightsDict.Add(flight, c);
+                                    }
+                                    else if (s == "NORM")
+                                    {
+                                        Flight c = new NORMFlight(flight, origin, destination, datetime, status);
+                                        flightsDict.Add(flight, c);
+                                    }
+                                    else if (s == "CFFT")
+                                    {
+                                        Flight c = new CFFTFlight(flight, origin, destination, datetime, status);
+                                        flightsDict.Add(flight, c);
+                                    }
+                                    else if (s == "LWTT")
+                                    {
+                                        Flight c = new LWTTFlight(flight, origin, destination, datetime, status);
+                                        flightsDict.Add(flight, c);
+                                    }
                                 }
-                                else if (s == "CFFT")
-                                {
-                                    Flight c = new CFFTFlight(flight, origin, destination, datetime, status);
-                                    flightsDict.Add(flight, c);
-                                }
-                                else if (s == "LWTT")
-                                {
-                                    Flight c = new LWTTFlight(flight, origin, destination, datetime, status);
-                                    flightsDict.Add(flight, c);
-                                }
+
 
 
                             }
@@ -660,8 +710,31 @@ internal class Program
                             {
                                 Console.WriteLine("Enter Boarding Gate Number: ");
                                 string? boarding_gate = Console.ReadLine();
-                                bg = boarding_gate;
+                                bool found = false;
+                                foreach (KeyValuePair<string, BoardingGate> b in boardingDict)
+                                {
+                                    if (b.Key == boarding_gate)
+                                    {
+                                        found = true;
+                                        bg = boarding_gate;
+                                        foreach(KeyValuePair<string,Flight> assign in flightsDict)
+                                        { if (assign.Value.FlightNumber == flight)
+                                            { b.Value.Flight = assign.Value; }
+                                        }
+                                    }
+                                    else { continue; }
+                                }
+                                if (found == false)
+                                {
+                                    Console.WriteLine("Boarding Gate Number not found");
+                                    break;
+                                }
 
+                            }
+
+                            else
+                            { Console.WriteLine("Option not found.");
+                                break;
                             }
                             // Displaying of Information about Flights
                             Console.WriteLine("Flight Updated!");
@@ -671,8 +744,9 @@ internal class Program
                             Console.WriteLine("Destination: {0}", f.Value.Destination);
                             Console.WriteLine("Expected Departure/Arrival Time: {0}", f.Value.ExpectedTime);
                             Console.WriteLine("Status: {0}", f.Value.Status);
-                            foreach(KeyValuePair<string,Flight> flights in flightsDict)
-                            {if(flights.Key==flight)
+                            foreach (KeyValuePair<string, Flight> flights in flightsDict)
+                            {
+                                if (flights.Key == flight)
                                 {
                                     string specialString = flights.Value.GetType().Name[0..4];
                                     if (specialString == "NORM")
@@ -681,41 +755,67 @@ internal class Program
                                     }
                                     Console.WriteLine("Special Request Code: {0}", specialString);
                                 }
-                                
-                            }  
+
+                            }
                             Console.WriteLine("Boarding Gate: {0}", bg);
-                            
+
 
 
                         }
                         //If the option is Delete Flight
-                        else if (option == 2 )
-                        { Console.WriteLine("Are you sure you want to delete [Y/N]:");
-                          string confirm = Console.ReadLine();
+                        else if (option == 2)
+                        {
+                            Console.WriteLine("Are you sure you want to delete [Y/N]:");
+                            string confirm = Console.ReadLine();
                             if (confirm == "Y")
                             {
                                 flightsDict.Remove(flight);
-                               
-
                             }
                             else
                             { break; }
-
-                            ListFlights(flightsDict, airlineDict);
-
-
                         }
 
+                        else 
+                        {
+                            Console.WriteLine("Option not found;");
+                                break; }
 
+                        // Listing of all Flights
+                        Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}{5,-11}{6,-20}{7,-23}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival ", "Status", "Special Request Code","Boarding Gate");
+                        foreach (KeyValuePair<string, Flight> f1 in flightsDict)
 
+                        { string gate = "Unassigned";
+                            foreach (KeyValuePair<string, BoardingGate> b1 in boardingDict)
+                            {
+                                if (b1.Value.Flight != null)
+                                {
+                                    if (b1.Value.Flight.FlightNumber == f1.Value.FlightNumber)
+                                    { gate = b1.Value.GateName; }
+                                }
+                            }
+                            Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-26}{5,-11}{6,-20}{7,-23}", f1.Value.FlightNumber, kvp.Value.Name, f1.Value.Origin, f1.Value.Destination, f1.Value.ExpectedTime, f1.Value.Status, f1.Value.GetType().Name[0..4], gate);
+                        }
 
                     }
 
 
+               
                 }
+
+
             }
         }
+        if (find == false)
+        { Console.WriteLine("Airline not found");
+        }
     }
+
+
+
+
+
+
+
     public static string AddFlight(Dictionary<string, Flight> flightsDict)
     {
         Console.Write("Enter Flight Number: ");
