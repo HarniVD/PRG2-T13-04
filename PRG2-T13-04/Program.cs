@@ -14,7 +14,6 @@ internal class Program
 {
     static Dictionary<string, Airline> airlineDict = new Dictionary<string, Airline>();
     static Dictionary<string, BoardingGate> boardingDict = new Dictionary<string, BoardingGate>();
-    // Changed the Flights Dictionary to a static variable
     static Dictionary<string, Flight> flightsDict = new Dictionary<string, Flight>();
     static Queue<Flight> queue = new Queue<Flight>();
     static List<BoardingGate> listBG = new List<BoardingGate>();
@@ -126,7 +125,7 @@ internal class Program
 
                 }
             }
-           
+
             else if (option == 8)
             {
                 foreach (BoardingGate bg in boardingDict.Values)
@@ -156,9 +155,9 @@ internal class Program
                 }
                 ProcessFlights(queue, listBG);
             }
-            else
+            else if (option == 9)
             {
-
+                CalculateAirlineFees();
             }
         }
     }
@@ -473,7 +472,7 @@ internal class Program
         }
         Console.WriteLine("{0} Airlines Loaded!", airlineDict.Count);
     }
-    
+
     //Loading of Boarding Gates
     private static void LoadBoardingGate()
     {
@@ -510,7 +509,7 @@ internal class Program
 
     // Feature 5 with Data Validation done 
     private static void DisplayAirLineFlights()
-    {  
+    {
         Console.WriteLine("{0,-16}{1,-17}", "Airline Code", "Airline Name");
         foreach (KeyValuePair<string, Airline> kvp in airlineDict)
         {
@@ -520,66 +519,69 @@ internal class Program
         Console.Write("Enter Airline Code: ");
         string? code = Console.ReadLine();
         Console.WriteLine("=============================================");
+
         bool airline = false;
         foreach (KeyValuePair<string, Airline> kvp in airlineDict)
+        {
+            if (kvp.Value.Code == code)
             {
-                if (kvp.Value.Code == code)
+                airline = true;
+                bool run = true;
+                while (run == true)
                 {
-                    airline = true;
-                    bool run = true;
-                    while (run == true)
+                    Console.WriteLine("List of Flights for {0}", kvp.Value.Name);
+                    Console.WriteLine("=============================================");
+                    Console.WriteLine("{0,-22}{1,-22}{2,-22}", "Flight Number", "Origin", "Destination");
+                    foreach (KeyValuePair<string, Flight> f in kvp.Value.Flights)
+                    { Console.WriteLine("{0,-22}{1,-22}{2,-22}", f.Value.FlightNumber, f.Value.Origin, f.Value.Destination); }
+                    Console.Write("Enter Flight Number: ");
+                    string? number = Console.ReadLine();
+                    bool found = false;
+                    foreach (KeyValuePair<string, Flight> flight in kvp.Value.Flights)
                     {
-                        Console.WriteLine("List of Flights for {0}", kvp.Value.Name);
-                        Console.WriteLine("=============================================");
-                        Console.WriteLine("{0,-22}{1,-22}{2,-22}", "Flight Number", "Origin", "Destination");
-                        foreach (KeyValuePair<string, Flight> f in kvp.Value.Flights)
-                        { Console.WriteLine("{0,-22}{1,-22}{2,-22}", f.Value.FlightNumber,  f.Value.Origin, f.Value.Destination); }
-                        Console.Write("Enter Flight Number: ");
-                        string? number = Console.ReadLine();
-                        bool found = false;
-                        foreach (KeyValuePair<string, Flight> flight in kvp.Value.Flights)
+                        if (flight.Value.FlightNumber == number)
                         {
-                            if (flight.Value.FlightNumber == number)
+                            Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}{5,-11}{6,-23}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival ", "Status", "Boarding Gate");
+                            string bg = "Unassigned";
+                            foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
+
                             {
-                                Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}{5,-11}{6,-23}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival ", "Status", "Boarding Gate");
-                                string bg = "Unassigned";
-                                foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
-
+                                if (boarding.Value.Flight != null)
                                 {
-                                    if (boarding.Value.Flight != null)
+                                    if (boarding.Value.Flight.FlightNumber == number)
                                     {
-                                        if (boarding.Value.Flight.FlightNumber == number)
-                                        {
-                                            bg = boarding.Value.GateName;
-
-                                        }
-                                        else
-                                        { continue; }
-
+                                        bg = boarding.Value.GateName;
 
                                     }
+                                    else
+                                    { continue; }
+
 
                                 }
-                                Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-26}{5,-11}{6,-23}", number, kvp.Value.Name, flight.Value.Origin, flight.Value.Destination, flight.Value.ExpectedTime, flight.Value.Status, bg);
-                                found = true;
-                                run = false;
-                                break;
-                                
-                            }
-                        }
 
-                        if (found == false)
-                        { Console.WriteLine("Flight number cannot be found");
-                            continue;
+                            }
+                            Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-26}{5,-11}{6,-23}", number, kvp.Value.Name, flight.Value.Origin, flight.Value.Destination, flight.Value.ExpectedTime, flight.Value.Status, bg);
+                            found = true;
+                            run = false;
+                            break;
+
                         }
                     }
 
+                    if (found == false)
+                    {
+                        Console.WriteLine("Flight number cannot be found");
+                        continue;
+                    }
                 }
+
+            }
         }
         if (airline == false)
-        { Console.WriteLine("Airline is not found");
+        {
+            Console.WriteLine("Airline is not found");
         }
-       
+
 
 
 
@@ -606,6 +608,7 @@ internal class Program
             if (kvp.Value.Code == code)
             {
                 find = true;
+                bool flight_found = false;
                 Console.WriteLine("List of Flights for {0}", kvp.Value.Name);
                 Console.WriteLine("=============================================");
                 Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival");
@@ -635,6 +638,7 @@ internal class Program
                 {
                     if (f.Value.FlightNumber == flight)
                     {
+                        flight_found = true;
                         Console.WriteLine("1.Modify Flight");
                         Console.WriteLine("2.Delete Flight");
                         Console.WriteLine("Choose an option: ");
@@ -723,8 +727,9 @@ internal class Program
                                     {
                                         found = true;
                                         bg = boarding_gate;
-                                        foreach(KeyValuePair<string,Flight> assign in flightsDict)
-                                        { if (assign.Value.FlightNumber == flight)
+                                        foreach (KeyValuePair<string, Flight> assign in flightsDict)
+                                        {
+                                            if (assign.Value.FlightNumber == flight)
                                             { b.Value.Flight = assign.Value; }
                                         }
                                     }
@@ -739,7 +744,8 @@ internal class Program
                             }
 
                             else
-                            { Console.WriteLine("Option not found.");
+                            {
+                                Console.WriteLine("Option not found.");
                                 break;
                             }
                             // Displaying of Information about Flights
@@ -755,7 +761,6 @@ internal class Program
                                 if (flights.Key == flight)
                                 {
                                     string specialString = flights.Value.GetType().Name[0..4];
-                                    if (specialString == "NORM")
                                     {
                                         specialString = "None";
                                     }
@@ -781,16 +786,18 @@ internal class Program
                             { break; }
                         }
 
-                        else 
+                        else
                         {
                             Console.WriteLine("Option not found;");
-                                break; }
+                            break;
+                        }
 
                         // Listing of all Flights
-                        Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}{5,-11}{6,-20}{7,-23}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival ", "Status", "Special Request Code","Boarding Gate");
+                        Console.WriteLine("{0,-22}{1,-22}{2,-22}{3,-22}{4,-22}{5,-11}{6,-20}{7,-23}", "Flight Number", "Airline Name", "Origin", "Destination", "Expected Departure / Arrival ", "Status", "Special Request Code", "Boarding Gate");
                         foreach (KeyValuePair<string, Flight> f1 in flightsDict)
 
-                        { string gate = "Unassigned";
+                        {
+                            string gate = "Unassigned";
                             foreach (KeyValuePair<string, BoardingGate> b1 in boardingDict)
                             {
                                 if (b1.Value.Flight != null)
@@ -805,14 +812,17 @@ internal class Program
                     }
 
 
-               
+
                 }
+                if (flight_found == false)
+                { Console.WriteLine("Flight not found"); }
 
 
             }
         }
         if (find == false)
-        { Console.WriteLine("Airline not found");
+        {
+            Console.WriteLine("Airline not found");
         }
     }
 
@@ -852,7 +862,7 @@ internal class Program
                 throw new Exception();
             }
         }
-        catch(ArgumentOutOfRangeException)
+        catch (ArgumentOutOfRangeException)
         {
             Console.WriteLine("Invalid airline code");
             return "";
@@ -1000,6 +1010,72 @@ internal class Program
             }
         }
         Console.WriteLine($"Total number of Flights and Boarding Gates processed and assigned: {count}");
-        Console.WriteLine($"{count/tempCount2 * 100:F2}% of currently assigned flights and boarding gates were processed automatically");
+        Console.WriteLine($"{count / tempCount2 * 100:F2}% of currently assigned flights and boarding gates were processed automatically");
     }
-}
+
+    public static void CalculateAirlineFees()
+    {
+        int count = 0;
+        foreach (KeyValuePair<string, Flight> kvp in flightsDict)
+        {
+            foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
+            {
+                if (kvp.Value == boarding.Value.Flight)
+                { count++; }
+                else { continue; }
+
+
+            }
+        }
+
+
+        Console.WriteLine("{0,-16}{1,-17}", "Airline Code", "Airline Name");
+        foreach (KeyValuePair<string, Airline> kvp in airlineDict)
+        {
+            Console.WriteLine("{0,-16}{1,-17}", kvp.Value.Code, kvp.Value.Name);
+        }
+
+        Console.Write("Enter Airline Code: ");
+        string? code = Console.ReadLine();
+        Console.WriteLine("=============================================");
+        foreach (KeyValuePair<string, Airline> airline in airlineDict)
+        {
+            if (airline.Key == code)
+            {
+                if (count == airline.Value.Flights.Count)
+                {
+                    foreach (KeyValuePair<string, Flight> flights in airline.Value.Flights)
+                    {
+                        string specialString = flights.Value.GetType().Name[0..4];
+                        if (specialString == "CFFT")
+                        {
+                            CFFTFlight cfft = (CFFTFlight)flights.Value;
+                            cfft.RequestFee = 150;
+                            Console.WriteLine(cfft.CalculateFees());
+                        }
+                        else if (specialString == "DDJB")
+                        {
+                            DDJBFlight ddjb = (DDJBFlight)flights.Value;
+                            ddjb.RequestFee = 300;
+                            Console.WriteLine(ddjb.CalculateFees());
+                        }
+                        else if (specialString == "LWTT")
+                        {
+                            LWTTFlight lwtt = (LWTTFlight)flights.Value;
+                            lwtt.RequestFee = 500;
+                            Console.WriteLine(lwtt.CalculateFees());
+                        }
+                    }
+                    double charge = airline.Value.CalculateFees();
+                    Console.WriteLine("Total charge for {0} airline: ${1:C2}", airline.Key, charge);
+                }
+                else { Console.WriteLine("Not all the flights have been assigned to a boarding gate.Please ensure that all flights have been assigned to a boarding gate."); }
+
+            }
+
+
+        }
+        }
+       
+    }
+

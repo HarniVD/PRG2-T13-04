@@ -24,21 +24,22 @@ namespace PRG2_T13_04
         private string status;
 
         public string FlightNumber
-        {  get { return flightNumber; } set { flightNumber = value; } }
+        { get { return flightNumber; } set { flightNumber = value; } }
 
         public string Origin
-            { get { return origin; } set { origin = value; } }
+        { get { return origin; } set { origin = value; } }
 
         public string Destination
-            { get { return destination; } set { destination = value; } }
+        { get { return destination; } set { destination = value; } }
 
         public DateTime ExpectedTime
-            { get { return expectedTime; } set { expectedTime = value; } }
+        { get { return expectedTime; } set { expectedTime = value; } }
 
         public string Status
-            { get { return status; } set { status = value; } }
+        { get { return status; } set { status = value; } }
 
-        public abstract double CalculateFees();
+        public double CalculateFees()
+        { return 300;}
         public int CompareTo(Flight other)
         {
             return ExpectedTime.CompareTo(other.ExpectedTime);

@@ -21,13 +21,13 @@ namespace PRG2_T13_04
         public double RequestFee
         { get { return requestFee; } set { requestFee = value; } }
 
-        public override double CalculateFees()
+        public double CalculateFees()
         {
-            double fee = 300;
+            double fee = 0; 
             if (Origin == "Singapore")
-            { fee += 500 + RequestFee; }
+            {  fee = fee + 500 + RequestFee + base.CalculateFees(); }
             else if (Destination == "Singapore")
-            { fee += 800 + RequestFee; }
+            {  fee = fee +  800 + RequestFee + base.CalculateFees(); }
             return fee;
         }
         public override string ToString()

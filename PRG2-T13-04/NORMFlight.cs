@@ -17,13 +17,13 @@ namespace PRG2_T13_04
 {
     internal class NORMFlight:Flight
     {
-        public override double CalculateFees()
+        public double CalculateFees()
         {
-            double fee = 300;
+            double fee = 50;
             if (Origin == "Singapore")
-            { fee += 500; }
-            else if (Destination =="Singapore")
-            { fee += 800; }
+            { fee += 500 + base.CalculateFees(); }
+            else if (Destination == "Singapore")
+            { fee += 800 + base.CalculateFees(); }
             return fee;
         }
 
