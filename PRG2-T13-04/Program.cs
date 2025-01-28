@@ -876,7 +876,8 @@ internal class Program
         Console.Write("Enter Origin: ");
         string? origin = Console.ReadLine();
         Console.Write("Enter Destination: ");
-        string? destination = Console.ReadLine(); Console.Write("Enter Expected Departure / Arrival Time(dd / mm / yyyy hh: mm): ");
+        string? destination = Console.ReadLine();
+        Console.Write("Enter Expected Departure / Arrival Time(dd / mm / yyyy hh: mm): ");
         try
         {
             expectedTime = Convert.ToDateTime(Console.ReadLine());
@@ -920,18 +921,18 @@ internal class Program
                     a.AddFlight(newFlight);
                 }
             }
+            Console.WriteLine($"Flight {flightNo} has been added");
+            Console.WriteLine("Would you like to add another flight? (Y/N)");
+            string? option = Console.ReadLine();
+            return option;
         }
         catch (ArgumentOutOfRangeException)
         {
             Console.WriteLine("Please enter a valid Special Request Code or 'None'");
             return "";
         }
-        Console.WriteLine($"Flight {flightNo} has been added");
-        Console.WriteLine("Would you like to add another flight? (Y/N)");
-        string? option = Console.ReadLine();
-        return option;
     }
-    static double count = 0;
+    static double counter = 0;
     public static void ProcessFlights(Queue<Flight> queue, List<BoardingGate> listBG)
     {
         double tempCount2 = 0;
@@ -1000,7 +1001,7 @@ internal class Program
                 code = "";
             }
             Console.WriteLine("{0,-18}{1,-22}{2,-22}{3,-22}{4,-35}{5,-24}{6,-22}", nextFlight.FlightNumber, airlineName, nextFlight.Origin, nextFlight.Destination, nextFlight.ExpectedTime, code, nextBG.GateName);
-            count += 1;
+            counter += 1;
         }
         foreach (BoardingGate bg in boardingDict.Values)
         {
@@ -1009,8 +1010,8 @@ internal class Program
                 tempCount2 += 1;
             }
         }
-        Console.WriteLine($"Total number of Flights and Boarding Gates processed and assigned: {count}");
-        Console.WriteLine($"{count / tempCount2 * 100:F2}% of currently assigned flights and boarding gates were processed automatically");
+        Console.WriteLine($"Total number of Flights and Boarding Gates processed and assigned: {counter}");
+        Console.WriteLine($"{counter / tempCount2 * 100:F2}% of currently assigned flights and boarding gates were processed automatically");
     }
 
     public static void CalculateAirlineFees()
