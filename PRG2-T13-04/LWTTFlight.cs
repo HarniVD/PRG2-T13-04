@@ -23,9 +23,9 @@ namespace PRG2_T13_04
         public double CalculateFees()
         {
             double fee = 0;
-            if (Origin == "Singapore")
+            if (Origin == "Singapore (SIN)")
             { fee += 500 + RequestFee + base.CalculateFees(); }
-            else if (Destination == "Singapore")
+            else if (Destination == "Singapore (SIN)")
             { fee += 800 + RequestFee + base.CalculateFees(); }
             return fee;
         }

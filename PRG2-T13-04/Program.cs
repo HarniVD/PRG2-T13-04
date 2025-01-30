@@ -1045,30 +1045,8 @@ internal class Program
             {
                 if (count == airline.Value.Flights.Count)
                 {
-                    foreach (KeyValuePair<string, Flight> flights in airline.Value.Flights)
-                    {
-                        string specialString = flights.Value.GetType().Name[0..4];
-                        if (specialString == "CFFT")
-                        {
-                            CFFTFlight cfft = (CFFTFlight)flights.Value;
-                            cfft.RequestFee = 150;
-                            Console.WriteLine(cfft.CalculateFees());
-                        }
-                        else if (specialString == "DDJB")
-                        {
-                            DDJBFlight ddjb = (DDJBFlight)flights.Value;
-                            ddjb.RequestFee = 300;
-                            Console.WriteLine(ddjb.CalculateFees());
-                        }
-                        else if (specialString == "LWTT")
-                        {
-                            LWTTFlight lwtt = (LWTTFlight)flights.Value;
-                            lwtt.RequestFee = 500;
-                            Console.WriteLine(lwtt.CalculateFees());
-                        }
-                    }
                     double charge = airline.Value.CalculateFees();
-                    Console.WriteLine("Total charge for {0} airline: ${1:C2}", airline.Key, charge);
+                    Console.WriteLine("Total charge for {0} airline: {1:C2}", airline.Key, charge);
                 }
                 else { Console.WriteLine("Not all the flights have been assigned to a boarding gate.Please ensure that all flights have been assigned to a boarding gate."); }
 

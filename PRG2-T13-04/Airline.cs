@@ -62,7 +62,32 @@ namespace PRG2_T13_04
             double fee = 0;
             foreach (KeyValuePair<string, Flight> kvp in Flights)
             {
-                fee += kvp.Value.CalculateFees();
+                string specialString = kvp.Value.GetType().Name[0..4];
+                if (specialString == "CFFT")
+                {
+
+                    CFFTFlight cfft = (CFFTFlight) kvp.Value;
+                    cfft.RequestFee = 150;
+                    fee += cfft.CalculateFees();
+                }
+                else if (specialString == "DDJB")
+                {
+                    DDJBFlight ddjb = (DDJBFlight) kvp.Value;
+                    ddjb.RequestFee = 300;
+                    fee += ddjb.CalculateFees();
+                }
+                else if (specialString == "LWTT")
+                {
+                    LWTTFlight lwtt = (LWTTFlight) kvp.Value;
+                    lwtt.RequestFee = 500;
+                    fee += lwtt.CalculateFees();
+                }
+                else
+                {
+                    NORMFlight norm = (NORMFlight) kvp.Value;
+                    fee += norm.CalculateFees();
+                }
+
 
             }
             bool found = false;

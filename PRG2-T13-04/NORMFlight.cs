@@ -19,11 +19,12 @@ namespace PRG2_T13_04
     {
         public double CalculateFees()
         {
-            double fee = 50;
-            if (Origin == "Singapore")
+            double fee = 0;
+            if (Origin == "Singapore (SIN)")
             { fee += 500 + base.CalculateFees(); }
-            else if (Destination == "Singapore")
+            else if (Destination == "Singapore (SIN)")
             { fee += 800 + base.CalculateFees(); }
+            fee = fee - 50;
             return fee;
         }
 
