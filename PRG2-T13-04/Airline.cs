@@ -90,6 +90,8 @@ namespace PRG2_T13_04
 
 
             }
+            if (Flights.Count > 5)
+            { fee = 0.97 * fee; }
             bool found = false;
             bool found1 = false;
             foreach (KeyValuePair<string, Flight> kvp in Flights)
@@ -106,8 +108,6 @@ namespace PRG2_T13_04
             double d = Flights.Count / 3;
             if (d>= 1)
             { fee = fee - (Math.Floor(d) * 350); }
-            if (Flights.Count>5)
-            { fee = 0.97 * fee; }
             
 
                 return fee;
