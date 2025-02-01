@@ -1017,19 +1017,7 @@ internal class Program
     public static void CalculateAirlineFees()
     {
         int count = 0;
-        foreach (KeyValuePair<string, Flight> kvp in flightsDict)
-        {
-            foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
-            {
-                if (kvp.Value == boarding.Value.Flight)
-                { count++; }
-                else { continue; }
-
-
-            }
-        }
-
-
+        
         Console.WriteLine("{0,-16}{1,-17}", "Airline Code", "Airline Name");
         foreach (KeyValuePair<string, Airline> kvp in airlineDict)
         {
@@ -1043,7 +1031,19 @@ internal class Program
         {
             if (airline.Key == code)
             {
-                if (count == airline.Value.Flights.Count)
+                foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
+                {
+                    foreach (KeyValuePair<string, Flight> kvp in airline.Value.Flights)
+                    {
+                        if (kvp.Value == boarding.Value.Flight)
+                        {
+                            count++;
+                            break;
+                        }
+                        else { continue; }
+                    }
+                }
+                    if (count == airline.Value.Flights.Count)
                 {
                     double charge = airline.Value.CalculateFees();
                     Console.WriteLine("Total charge for {0} airline: {1:C2}", airline.Key, charge);
