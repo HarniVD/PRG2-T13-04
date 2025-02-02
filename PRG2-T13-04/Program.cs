@@ -1027,10 +1027,12 @@ internal class Program
         Console.Write("Enter Airline Code: ");
         string? code = Console.ReadLine();
         Console.WriteLine("=============================================");
+        bool found = false;
         foreach (KeyValuePair<string, Airline> airline in airlineDict)
         {
             if (airline.Key == code)
             {
+                found = true;
                 foreach (KeyValuePair<string, BoardingGate> boarding in boardingDict)
                 {
                     foreach (KeyValuePair<string, Flight> kvp in airline.Value.Flights)
@@ -1054,7 +1056,9 @@ internal class Program
 
 
         }
-        }
+        if (found == false)
+        { Console.WriteLine("No such airline available."); }
+    }
        
     }
 
